@@ -15,7 +15,7 @@ import java.util.Map;
 public class JobSetting {
     private final Scheduler scheduler;
 
-    @PostConstruct
+//    @PostConstruct
     public void start() {
         JobDetail jobDetail = buildJobDetail(HankerJobA.class, new HashMap());
 //        JobDetail jobDetail = buildJobDetail(TestJob1.class, new HashMap());

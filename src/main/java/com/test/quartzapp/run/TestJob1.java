@@ -3,6 +3,8 @@ package com.test.quartzapp.run;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
+import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,20 +15,22 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.time.LocalTime;
 
+/**
+ * TestJob1 : TestJar1.jar 를 시작시키는 JOB 클래스
+ * */
 @Slf4j
-//@Component
+@Component
 public class TestJob1 extends QuartzJobBean {
 
     @Override
-    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        log.info("["+ LocalTime.now()+"]" + "[log] : " + this.getClass().toString());
+    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        log.info("[" + LocalTime.now() + "] "+ this.getClass().toString());
 
-        // 'TestRunApp2_HTTPRequestCall' 프로그램 실행호출
+        String command = "java -jar C:\\schedule_test\\jars\\TestJar1.jar";
         Runtime runtime = Runtime.getRuntime();
-        try {
-            Process execRsltPrc = runtime.exec("java -jar C:\\schedule_test\\jars\\TestRunApp2_HTTPRequestCall-0.0.1-SNAPSHOT.jar");
-            log.info("[실행결과]: " + execRsltPrc.info().toString());
 
+        try {
+            runtime.exec(command);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
