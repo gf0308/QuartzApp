@@ -11,4 +11,6 @@ public interface QuartzRepository {
 
     List<JobMstVo> selectJobList();
 
+    JobMstVo selectJobDetail(String jobRid);
+
 }

@@ -25,10 +25,13 @@ public class QuartzAppService {
         return quartzRepository.selectJobList();
     }
 
+    public JobMstVo getJobDetail(String jobRid) {
+        return quartzRepository.selectJobDetail(jobRid);
+    }
 
-    public JobKey startJob(Class<?> jobClass, String jobKeyId) { // jobIdClass : TestJob1, TestJob2, ...
-        JobDetail jobDetail = buildJobDetail(jobClass, new HashMap(), jobKeyId);
 
+    public JobKey runJob(Class<?> jobClassObj, String jobRid) { // jobIdClass : TestJob1, TestJob2, ...
+        JobDetail jobDetail = buildJobDetail(jobClassObj, new HashMap(), jobRid);
         JobKey jobKey = jobDetail.getKey();
         log.info("start job Key: " + jobKey.toString());
 
@@ -45,7 +48,7 @@ public class QuartzAppService {
         log.info("stop job Key: " + jobKey);
 
         try {
-            scheduler.deleteJob(jobKey);
+            scheduler.deleteJob(jobKey); // deleteJob을 호출하면 'SchedulerException'을 던진다!
         } catch(SchedulerException se) {
             log.error(se.getMessage());
         }
@@ -58,12 +61,12 @@ public class QuartzAppService {
                 .build();
     }
 
-    private JobDetail buildJobDetail(Class job, Map params, String jobKeyId) { // withIdentity(JobKey.jobKey("key","group"))
+    private JobDetail buildJobDetail(Class job, Map params, String jobRid) { // withIdentity(JobKey.jobKey("key","group"))
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.putAll(params);
 
         return JobBuilder.newJob(job)
-                .withIdentity(jobKeyId)
+                .withIdentity(jobRid)
                 .usingJobData(jobDataMap)
                 .build();
     }
