@@ -1,11 +1,7 @@
 package com.test.quartzapp.conf;
 
-import com.test.quartzapp.run.HankerJobA;
-import lombok.RequiredArgsConstructor;
+import com.test.quartzapp.temp.HankerJobA;
 import org.quartz.*;
-import org.quartz.impl.JobDetailImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;

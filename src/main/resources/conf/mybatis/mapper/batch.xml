@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.test.quartzapp.repository.QuartzRepository">
+
+    <select id="selectBatchList" resultType="com.test.quartzapp.model.vo.JobMstVo">
+        SELECT
+               RID
+             , CREATE_BY
+             , CREATE_DATE
+             , MODIFY_BY
+             , MODIFY_DATE
+             , FLAG
+             , JOB_NAME
+             , JOB_DESC
+             , STATUS
+             , CRON_EXP
+             , CRON_EXP_DESC
+             , RUN_RESULT
+             , JOB_CLASS_FULL_PATH
+        FROM JOB_MST
+        WHERE 1=1
+          AND FLAG = '1'
+    </select>
+
+
+
+</mapper>

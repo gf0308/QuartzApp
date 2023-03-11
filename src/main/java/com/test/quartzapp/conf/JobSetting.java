@@ -1,12 +1,10 @@
 package com.test.quartzapp.conf;
 
-import com.test.quartzapp.run.HankerJobA;
-import com.test.quartzapp.run.TestJob1;
+import com.test.quartzapp.temp.HankerJobA;
 import lombok.RequiredArgsConstructor;
 import org.quartz.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import javax.annotation.PostConstruct;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +21,7 @@ public class JobSetting {
         try {
 //            scheduler.scheduleJob(jobDetail, buildJobTrigger("0/30 * * * * ?")); // "0/10 * * * * ?" : 10초 마다 실행 (0초시작해서)
 //            scheduler.scheduleJob(jobDetail, buildJobTrigger("0/30 * * * * ?"));
-            scheduler.scheduleJob(jobDetail, buildJobTrigger("0/10 * * * * ?"));
+            scheduler.scheduleJob(jobDetail, buildJobTrigger("0/5 * * * * ?"));
         } catch(SchedulerException e) {
             e.printStackTrace();
         }
