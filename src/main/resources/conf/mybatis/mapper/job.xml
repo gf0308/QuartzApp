@@ -3,7 +3,7 @@
 
 <mapper namespace="com.test.quartzapp.repository.QuartzRepository">
 
-    <select id="selectBatchList" resultType="com.test.quartzapp.model.vo.JobMstVo">
+    <select id="selectJobList" resultType="com.test.quartzapp.model.vo.JobMstVo">
         SELECT
                RID
              , CREATE_BY

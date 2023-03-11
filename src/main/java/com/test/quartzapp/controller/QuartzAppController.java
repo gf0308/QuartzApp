@@ -26,13 +26,13 @@ public class QuartzAppController {
     private static final String NO_JOB_CLASS = "해당 Job 클래스가 존재하지 않습니다.";
 
 
-    @PostMapping("/getBatchList")
-    public List<JobMstVo> getBatchList() {
-        return quartzAppService.getBatchList();
+    @PostMapping("/getJobList")
+    public List<JobMstVo> getJobList() {
+        return quartzAppService.getJobList();
     }
 
 
-    @GetMapping("/start")
+    @GetMapping("/runBatch")
     public String startJob(String jobClassFullPath, String jobKeyId) {
         if (isEmpty(jobClassFullPath)) {
             return NO_JOB_CLASS_FULL_PATH;

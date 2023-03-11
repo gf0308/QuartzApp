@@ -9,6 +9,6 @@ import java.util.List;
 @Mapper
 public interface QuartzRepository {
 
-    List<JobMstVo> selectBatchList();
+    List<JobMstVo> selectJobList();
 
 }

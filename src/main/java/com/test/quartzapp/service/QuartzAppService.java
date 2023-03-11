@@ -21,8 +21,8 @@ public class QuartzAppService {
     private final String scheduleExp = "0/10 * * * * ?";
 
 
-    public List<JobMstVo> getBatchList() {
-        return quartzRepository.selectBatchList();
+    public List<JobMstVo> getJobList() {
+        return quartzRepository.selectJobList();
     }
 
 
