@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +27,6 @@ public class QuartzAppService {
     public JobMstVo getJobDetail(String jobRid) {
         return quartzRepository.selectJobDetail(jobRid);
     }
-
 
     public Date runJob(Class<?> jobClassObj, String jobRid, String scheduleExp) {
         JobDetail jobDetail = buildJobDetail(jobClassObj, new HashMap(), jobRid);
