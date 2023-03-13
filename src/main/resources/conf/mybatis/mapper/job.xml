@@ -14,8 +14,8 @@
              , JOB_NAME
              , JOB_DESC
              , STATUS
-             , CRON_EXP
-             , CRON_EXP_DESC
+             , SCHEDULE_EXP
+             , SCHEDULE_EXP_DESC
              , RUN_RESULT
              , JOB_CLASS_FULL_PATH
         FROM JOB_MST
@@ -35,8 +35,8 @@
              , JOB_NAME
              , JOB_DESC
              , STATUS
-             , CRON_EXP
-             , CRON_EXP_DESC
+             , SCHEDULE_EXP
+             , SCHEDULE_EXP_DESC
              , RUN_RESULT
              , JOB_CLASS_FULL_PATH
         FROM JOB_MST

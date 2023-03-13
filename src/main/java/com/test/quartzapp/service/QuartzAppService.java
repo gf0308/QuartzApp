@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +20,6 @@ public class QuartzAppService {
 
     private final QuartzRepository quartzRepository;
     private final Scheduler scheduler;
-    private final String scheduleExp = "0/10 * * * * ?";
-
 
     public List<JobMstVo> getJobList() {
         return quartzRepository.selectJobList();
@@ -30,28 +30,28 @@ public class QuartzAppService {
     }
 
 
-    public JobKey runJob(Class<?> jobClassObj, String jobRid) { // jobIdClass : TestJob1, TestJob2, ...
+    public Date runJob(Class<?> jobClassObj, String jobRid, String scheduleExp) {
         JobDetail jobDetail = buildJobDetail(jobClassObj, new HashMap(), jobRid);
-        JobKey jobKey = jobDetail.getKey();
-        log.info("start job Key: " + jobKey.toString());
+        Date runDate = null;
 
         try {
-            scheduler.scheduleJob(jobDetail, buildJobTrigger(scheduleExp));
+            runDate = scheduler.scheduleJob(jobDetail, buildJobTrigger(scheduleExp));
         } catch(SchedulerException e) {
             log.error(e.getMessage());
         }
 
-        return jobKey;
+        return runDate;
     }
 
-    public void stopJob(JobKey jobKey) {
-        log.info("stop job Key: " + jobKey);
-
+    public boolean stopJob(JobKey jobKey) {
+        boolean stopResult = false;
         try {
-            scheduler.deleteJob(jobKey); // deleteJob을 호출하면 'SchedulerException'을 던진다!
+            stopResult = scheduler.deleteJob(jobKey);
         } catch(SchedulerException se) {
             log.error(se.getMessage());
         }
+
+        return stopResult;
     }
 
 
@@ -61,7 +61,7 @@ public class QuartzAppService {
                 .build();
     }
 
-    private JobDetail buildJobDetail(Class job, Map params, String jobRid) { // withIdentity(JobKey.jobKey("key","group"))
+    private JobDetail buildJobDetail(Class job, Map params, String jobRid) {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.putAll(params);
 

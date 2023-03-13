@@ -23,8 +23,8 @@ public class JobMstVo {
     private String jobName;
     private String jobDesc;
     private String status;
-    private String cronExp;
-    private String cronExpDesc;
+    private String scheduleExp;
+    private String scheduleExpDesc;
     private String runResult;
     private String jobClassFullPath;
 

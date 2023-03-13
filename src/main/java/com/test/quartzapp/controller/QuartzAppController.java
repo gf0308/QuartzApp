@@ -1,16 +1,17 @@
 package com.test.quartzapp.controller;
 
-import com.test.quartzapp.model.dto.JobMstDto;
+import com.test.quartzapp.constant.JobConstants;
+import com.test.quartzapp.exception.JobException;
 import com.test.quartzapp.model.vo.JobMstVo;
+import com.test.quartzapp.model.vo.JobResVo;
 import com.test.quartzapp.service.QuartzAppService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobKey;
-import org.quartz.SchedulerException;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -18,61 +19,66 @@ import java.util.List;
 @RequestMapping("/batch")
 @RestController
 public class QuartzAppController {
+
     private final QuartzAppService quartzAppService;
-
-    private static final String NO_JOB_CLASS_FULL_PATH = "jobClassFullPath 가 없습니다. jobClassFullPath 입력해주세요.";
-    private static final String NO_JOB_RID = "jobRid 가 없습니다. jobRid를 입력해주세요.";
-    private static final String NO_SUCH_JOB = "해당 JOB 이 존재하지 않습니다.";
-    private static final String START_COMPLETE = "정상적으로 시작됨";
-    private static final String STOP_COMPLETE = "정상적으로 중지됨";
-    private static final String NO_JOB_CLASS = "해당 Job 클래스가 존재하지 않습니다.";
-
 
     @PostMapping("/getJobList")
     public List<JobMstVo> getJobList() {
         return quartzAppService.getJobList();
     }
 
-
     @PostMapping("/runJob")
-    public String runJob(String jobRid) {
-        if (isEmpty(jobRid)) {
-            return NO_JOB_RID;
-        }
-        // jobRid 를 이용해 job을 조회해서 jobClassFullPath를 얻고 이용하기
+    public JobResVo runJob(String jobRid) throws JobException {
+        if (isEmpty(jobRid)) throw new JobException(JobConstants.NO_JOB_RID);
+
         JobMstVo jobDetailVo = quartzAppService.getJobDetail(jobRid);
-        if (jobDetailVo == null) {
-            return NO_SUCH_JOB;
+        if (jobDetailVo == null) throw new JobException(JobConstants.NO_SUCH_JOB);
+
+        String jobClassFullPath = jobDetailVo.getJobClassFullPath(); // "com.test.quartzapp.run.TestJob1"
+        if (isEmpty(jobClassFullPath)) throw new JobException(JobConstants.NO_JOB_CLASS_FULL_PATH);
+
+        String scheduleExp = jobDetailVo.getScheduleExp();
+        if (isEmpty(scheduleExp)) throw new JobException(JobConstants.NO_SCHEDULE_EXP);
+
+        Class<?> jobClassObj = getClassObjectOfJob(jobClassFullPath);
+        if (jobClassObj == null) throw new JobException(JobConstants.NO_JOB_CLASS);
+
+        Date runDate = quartzAppService.runJob(jobClassObj, jobRid, scheduleExp);
+
+        JobResVo jobResVo = new JobResVo();
+        jobResVo.setJobRid(jobRid);
+        if (runDate != null) {
+            jobResVo.setJobProcessResult(JobConstants.RUN_COMPLETE);
+            jobResVo.setProcessDateTime(runDate.toString());
+        } else {
+            jobResVo.setJobProcessResult(JobConstants.RUN_FAIL);
         }
 
-        String jobClassFullPath = jobDetailVo.getJobClassFullPath();
-        if (isEmpty(jobClassFullPath)) {
-            return NO_JOB_CLASS_FULL_PATH;
-        }
-
-        Class<?> jobClassObj = getClassObjOfJobClass(jobClassFullPath); // "com.test.quartzapp.run.TestJob1"
-        if (jobClassObj == null) {
-            return NO_JOB_CLASS;
-        }
-
-        JobKey jobKey = quartzAppService.runJob(jobClassObj, jobRid);
-
-        return START_COMPLETE + " => jobKey : " + jobKey.toString();
+        return jobResVo;
     }
+
 
     @PostMapping("/stopJob")
-    public void stopJob(String jobRid) throws SchedulerException { // 'stopJob' 호출 시 jobRid 가 전송되어 같이 온다.
-        if (isEmpty(jobRid)) {
-            throw new SchedulerException(NO_JOB_RID);
+    public JobResVo stopJob(String jobRid) throws JobException {
+        if (isEmpty(jobRid)) throw new JobException(JobConstants.NO_JOB_RID);
+
+        boolean stopResult = quartzAppService.stopJob(JobKey.jobKey(jobRid));
+
+        JobResVo jobResVo = new JobResVo();
+        jobResVo.setJobRid(jobRid);
+        jobResVo.setProcessDateTime(new Date().toString());
+        if (stopResult) {
+            jobResVo.setJobProcessResult(JobConstants.STOP_COMPLETE);
+        } else {
+            jobResVo.setJobProcessResult(JobConstants.STOP_FAIL);
         }
 
-        quartzAppService.stopJob(JobKey.jobKey(jobRid));
-        // job이 끝나긴 했는데, 아래 리턴문으로 넘어가진 않은것 같음. (아마 위 statement에서 예외로 빠진듯?)
-        // 왜냐하면 deleteJob을 호출하면 'SchedulerException'을 던지기 때문 ! => 이후 작업을 뭘 할수가 없음. 여기를 마지막으로 끝내야 한다.
+        return jobResVo;
     }
 
 
-    private static Class<?> getClassObjOfJobClass(String jobClassFullPath) {
+
+    private static Class<?> getClassObjectOfJob(String jobClassFullPath) {
         Class<?> jobIdClass = null;
         try {
             jobIdClass = Class.forName(jobClassFullPath);
