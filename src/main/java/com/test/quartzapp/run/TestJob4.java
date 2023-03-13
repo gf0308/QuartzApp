@@ -22,11 +22,10 @@ public class TestJob4 extends QuartzJobBean {
 
         String command = "java -jar C:\\schedule_test\\jars\\TestJar4.jar";
         Runtime runtime = Runtime.getRuntime();
-
         try {
             runtime.exec(command);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage());
         }
 
     }
