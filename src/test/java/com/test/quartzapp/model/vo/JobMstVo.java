@@ -1,6 +1,9 @@
 package com.test.quartzapp.model.vo;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -24,11 +27,11 @@ public class JobMstVo {
     private String flag;
     private String jobName;
     private String jobDesc;
-    private String jobStatus;
+    private String status;
     private String scheduleExp;
     private String scheduleExpDesc;
-    private String resultCd;
-    private String jobClassFullPath;
+    private String runResult;
+//    private String jobClassFullPath;
     private JobStepVo jobStep;
 
 }

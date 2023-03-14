@@ -1,16 +1,15 @@
-package com.test.quartzapp.conf;
+package com.test.quartzapp.temp;
 
 import com.test.quartzapp.temp.HankerJobA;
 import lombok.RequiredArgsConstructor;
 import org.quartz.*;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Configuration
+//@Configuration
 @RequiredArgsConstructor
-public class JobSetting {
+public class JobSetting_Depricated {
     private final Scheduler scheduler;
 
 //    @PostConstruct

@@ -1,4 +1,4 @@
-package com.test.quartzapp.conf;
+package com.test.quartzapp.temp;
 
 import com.test.quartzapp.temp.HankerJobA;
 import org.quartz.*;

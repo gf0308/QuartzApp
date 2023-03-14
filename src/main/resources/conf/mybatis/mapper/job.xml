@@ -13,17 +13,16 @@
              , FLAG
              , JOB_NAME
              , JOB_DESC
-             , STATUS
+             , JOB_STATUS
              , SCHEDULE_EXP
              , SCHEDULE_EXP_DESC
-             , RUN_RESULT
-             , JOB_CLASS_FULL_PATH
+             , RESULT_CD
         FROM JOB_MST
         WHERE 1=1
           AND FLAG = '1'
     </select>
 
-    <select id="selectJobDetail" parameterType="java.lang.String"
+    <select id="selectJobMaster" parameterType="java.lang.String"
                                  resultType="com.test.quartzapp.model.vo.JobMstVo">
         SELECT
                RID
@@ -34,17 +33,59 @@
              , FLAG
              , JOB_NAME
              , JOB_DESC
-             , STATUS
+             , JOB_STATUS
              , SCHEDULE_EXP
              , SCHEDULE_EXP_DESC
-             , RUN_RESULT
-             , JOB_CLASS_FULL_PATH
+             , RESULT_CD
         FROM JOB_MST
         WHERE 1=1
           AND FLAG = '1'
           AND RID = #{jobRid}
     </select>
 
+    <select id="selectJobStep" parameterType="java.lang.String"
+                               resultType="com.test.quartzapp.model.vo.JobStepVo">
+        SELECT
+               RID
+             , CREATE_BY
+             , CREATE_DATE
+             , MODIFY_BY
+             , MODIFY_DATE
+             , FLAG
+             , STEP_SEQ
+             , STEP_NAME
+             , STEP_DESC
+             , STEP_TYPE
+             , RID_JOB_MST
+        FROM JOB_STEP
+        WHERE FLAG = '1'
+          AND RID_JOB_MST = #{ridJobMst}
+    </select>
 
+    <select id="selectJobStepParam" parameterType="java.lang.String"
+                                    resultType="com.test.quartzapp.model.vo.JobStepParamVo">
+        SELECT
+               RID
+             , CREATE_BY
+             , CREATE_DATE
+             , MODIFY_BY
+             , MODIFY_DATE
+             , FLAG
+             , PARAM_NAME
+             , PARAM_DESC
+             , PARAM_CONTENT
+             , RID_JOB_STEP
+        FROM JOB_STEP_PARAM
+        WHERE FLAG = '1'
+          AND RID_JOB_STEP = #{ridJobStep}
+    </select>
+
+    <update id="updateJobStatus" parameterType="com.test.quartzapp.model.vo.JobMstVo">
+        UPDATE JOB_MST
+        SET    MODIFY_BY = 'tester'
+             , MODIFY_DATE = NOW()
+             , JOB_STATUS = #{jobStatus}
+        WHERE RID = #{rid}
+    </update>
 
 </mapper>

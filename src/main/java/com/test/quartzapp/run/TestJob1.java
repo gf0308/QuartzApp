@@ -1,6 +1,7 @@
 package com.test.quartzapp.run;
 
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
@@ -16,7 +17,7 @@ import java.io.IOException;
 import java.time.LocalTime;
 
 /**
- * TestJob1 : TestJar1.jar 를 시작시키는 JOB 클래스
+ * TestJob1 : JAR 파일을 실행시키는 JOB 클래스
  * */
 @Slf4j
 @Component
@@ -26,13 +27,20 @@ public class TestJob1 extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         log.info("[" + LocalTime.now() + "] "+ this.getClass().toString());
 
-        String command = "java -jar C:\\schedule_test\\jars\\TestJar1.jar";
+        JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
+        String jarRunCommand = (String) jobDataMap.get("jarRunCommand");
+
+//        String command = "java -jar C:\\schedule_test\\jars\\TestJar1.jar";
         Runtime runtime = Runtime.getRuntime();
         try {
-            runtime.exec(command);
+            runtime.exec(jarRunCommand);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
 
     }
 }
+
+
+
+

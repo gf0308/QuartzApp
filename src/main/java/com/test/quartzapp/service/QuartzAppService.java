@@ -1,8 +1,11 @@
 package com.test.quartzapp.service;
 
-import com.test.quartzapp.model.dto.JobMstDto;
+import com.test.quartzapp.batch.conf.JobSetting;
 import com.test.quartzapp.model.vo.JobMstVo;
+import com.test.quartzapp.model.vo.JobStepVo;
 import com.test.quartzapp.repository.QuartzRepository;
+import com.test.quartzapp.temp.JarRunJob;
+import com.test.quartzapp.temp.JobSetting_deprecated;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
@@ -24,16 +27,21 @@ public class QuartzAppService {
         return quartzRepository.selectJobList();
     }
 
-    public JobMstVo getJobDetail(String jobRid) {
-        return quartzRepository.selectJobDetail(jobRid);
+    public JobMstVo getJobMaster(String jobRid) {
+        JobMstVo jobMstVo = quartzRepository.selectJobMaster(jobRid);
+        JobStepVo jobStepVo = quartzRepository.selectJobStep(jobRid);
+        jobStepVo.setJobStepParam(quartzRepository.selectJobStepParam(jobStepVo.getRid()));
+        jobMstVo.setJobStep(jobStepVo);
+        return jobMstVo;
     }
 
-    public Date runJob(Class<?> jobClassObj, String jobRid, String scheduleExp) {
-        JobDetail jobDetail = buildJobDetail(jobClassObj, new HashMap(), jobRid);
+    public Date runJob(Class<? extends Job> jobClassObject, String scheduleExp, String jobRid, String stepType, String paramContent) {
         Date runDate = null;
+        JobDetail jobDetail = JobSetting.buildJobDetail(jobClassObject, jobRid, stepType, paramContent);
+        Trigger trigger = JobSetting.buildJobTrigger(scheduleExp);
 
         try {
-            runDate = scheduler.scheduleJob(jobDetail, buildJobTrigger(scheduleExp));
+            runDate = scheduler.scheduleJob(jobDetail, trigger);
         } catch(SchedulerException e) {
             log.error(e.getMessage());
         }
@@ -52,21 +60,38 @@ public class QuartzAppService {
         return stopResult;
     }
 
-
-    private Trigger buildJobTrigger(String scheduleExp) {
-        return TriggerBuilder.newTrigger()
-                .withSchedule(CronScheduleBuilder.cronSchedule(scheduleExp))
-                .build();
+    public void editJobStatus(JobMstVo vo) {
+        quartzRepository.updateJobStatus(vo);
     }
 
-    private JobDetail buildJobDetail(Class job, Map params, String jobRid) {
-        JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.putAll(params);
+    public void testToAccessJobExecutionContext(String stepType) throws SchedulerException {
+        if (stepType.equals("RUN JAR")) {
+            // stepType : "RUN JAR" 인 케이스 => 사용할 JOB 클래스: JarRunJob.class
+            Class JobClassObject = JarRunJob.class;
 
-        return JobBuilder.newJob(job)
-                .withIdentity(jobRid)
-                .usingJobData(jobDataMap)
-                .build();
+            String paramContent = "C:\\schedule_test\\jars\\TestJar1.jar"; // 어디로부턴가 받아온 파라미터값, : "C:\schedule_test\jars\TestJar1.jar"
+            String scheduleExp = "0/5 * * * * ?";                          // 어딘가로부터 받아온 스케줄표현식 값 : "0/5 * * * * ?"
+            String jobRid = "ec894d56d097488cac23c8d7e5305cac";                 // 어딘가로부터 받아온 jobRid: "ec894d56d097488cac23c8d7e5305cac"
+
+            // jobDataMap 재료 작성
+            String runJarCommand = "java -jar " + paramContent;
+            Map<String, String> hashMap = new HashMap<>();
+            hashMap.put("runJarCommand", runJarCommand);
+
+            // jobDetail 빌드
+            JobDetail jobDetail = JobSetting_deprecated.buildJobDetail(JobClassObject, hashMap, jobRid);
+            // JobTrigger 생성
+            Trigger trigger = JobSetting_deprecated.buildJobTrigger(scheduleExp);
+            // 스케줄러에서 스케줄 실행
+            Date date = scheduler.scheduleJob(jobDetail, trigger);
+
+            System.out.println("스케줄 정상 실행 / 실행시각: " + date);
+
+        } else if(stepType.equals("CALL API")) {
+            // ...
+        } else if(stepType.equals("CALL PROCEDURE")) {
+            // ...
+        }
     }
 
 }

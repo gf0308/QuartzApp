@@ -1,6 +1,9 @@
 package com.test.quartzapp.model.dto;
 
+import com.test.quartzapp.model.vo.JobStepVo;
 import lombok.*;
+
+import java.util.List;
 
 /**
  * Job 마스터 VO
@@ -22,11 +25,12 @@ public class JobMstDto {
         private String flag;
         private String jobName;
         private String jobDesc;
-        private String status;
-        private String cronExp;
-        private String cronExpDesc;
-        private String runResult;
-        private String jobClassFullPath;
+        private String jobStatus;
+        private String scheduleExp;
+        private String scheduleExpDesc;
+        private String resultCd;
+//        private String jobClassFullPath;
+        private JobStepVo jobStep;
     }
 
     @Getter
@@ -41,10 +45,11 @@ public class JobMstDto {
         private String flag;
         private String jobName;
         private String jobDesc;
-        private String status;
-        private String cronExp;
-        private String cronExpDesc;
-        private String runResult;
-        private String jobClassFullPath;
+        private String jobStatus;
+        private String scheduleExp;
+        private String scheduleExpDesc;
+        private String resultCd;
+//        private String jobClassFullPath;
+        private JobStepVo jobStep;
     }
 }
